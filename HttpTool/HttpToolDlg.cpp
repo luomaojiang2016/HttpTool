@@ -61,7 +61,7 @@ END_MESSAGE_MAP()
 
 CHttpToolDlg::CHttpToolDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(IDD_HTTPTOOL_DIALOG, pParent)
-	, m_edit_url_value(_T("http://127.0.0.1:7001/v1/api/user"))
+	, m_edit_url_value(_T("https://slb-upgrade-testing.lenovo.com.cn/api/1.0/upgrade/result"))
 	, str_Edit_ReqBody(_T("{}"))
 	, str_Edit_RepBody(_T(""))
 	, m_edit_interval(0)
@@ -272,7 +272,7 @@ void CHttpToolDlg::OnBnClickedButton1()
 	request.timeout = 3000;
 	request.followRedirects = false;
 	request.headers["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36";
-	request.headers["Cookie"] = "name=value;";
+	request.headers["Content-Type"] = "application/json";
 	RestClient::Response response;
 	setlocale(LC_ALL, "CHS");
 	std::string _Url = CT2A(m_edit_url_value, CP_ACP);
@@ -289,7 +289,7 @@ void CHttpToolDlg::OnBnClickedButton1()
 		response = RestClient::head(_Url, &request);
 	}
 	else if (_Method == "Post") {
-		response = RestClient::post(_Url, "text/json", _Body, &request);
+		response = RestClient::post(_Url, "json", _Body, &request);
 	}
 	else if (_Method == "Put") {
 		response = RestClient::put(_Url, "text/json", _Body, &request);
@@ -305,27 +305,7 @@ void CHttpToolDlg::OnBnClickedButton1()
 }
 
 
-BOOL CHttpToolDlg::PreTranslateMessage(MSG* pMsg)
 
-{
-	if (pMsg->message == WM_KEYDOWN)  //判断是否有按键按下     
-	{
-		switch (pMsg->wParam)
-		{
-		case VK_DOWN:     //表示是方向键中的向下的键               //add handle code here           
-			break;
-		case VK_RETURN: //Enter按键事件
-			//return true;
-
-		default:
-
-			break;
-
-		}
-
-	}
-	return CDialog::PreTranslateMessage(pMsg);
-}
 void CHttpToolDlg::Start() {
 //	UpdateData();
 	std::string strProxy = "http=115.29.2.139:80";
@@ -335,10 +315,10 @@ void CHttpToolDlg::Start() {
 	request.proxy.username = "";
 	request.proxy.password = "";
 
-	request.timeout = 3000;
+	request.timeout = 60000;
 	request.followRedirects = false;
 	request.headers["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36";
-	request.headers["Cookie"] = "name=value;";
+	request.headers["Content-Type"] = "application/json";
 	RestClient::Response response;
 	while (!IsStop) {
 
@@ -359,21 +339,22 @@ void CHttpToolDlg::Start() {
 		else if (_Method == "Post") {
 			response=RestClient::post(_Url, "text/json", _Body, &request);
 		}
-		std::string strBody = response.body;
-		str_Edit_RepBody = strBody.c_str();
 
-		((CEdit*)GetDlgItem(IDC_EDIT_RepBody))->SetWindowText(str_Edit_RepBody);
-		int code = (response.code == 200) ? 200 : GetLastError();
-		CString _code;
-		_code.Format(_T("%d"), code);
-		((CListBox*)GetDlgItem(IDC_LIST_RepHeader))->AddString(_code);
+		//std::string strBody = response.body;
+		//str_Edit_RepBody = strBody.c_str();
 
-		if (response.code == 200) {
+		//((CEdit*)GetDlgItem(IDC_EDIT_RepBody))->SetWindowText(str_Edit_RepBody);
+		//int code = (response.code == 200) ? 200 : GetLastError();
+		//CString _code;
+		//_code.Format(_T("%d"), code);
+	//	((CListBox*)GetDlgItem(IDC_LIST_RepHeader))->AddString(_code);
+
+	//	if (response.code == 200) {
 			SuccessReqCount++;
-		}
-		else {
-			ErrorReqCount++;
-		}
+	//	}
+	//	else {
+		//	ErrorReqCount++;
+	//	}
 	
 
 	}
@@ -414,3 +395,4 @@ void CHttpToolDlg::OnTimer(UINT_PTR nIDEvent)
 
 	CDialogEx::OnTimer(nIDEvent);
 }
+
